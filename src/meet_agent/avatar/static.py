@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 from meet_agent.avatar.base import AvatarRenderer
 
@@ -21,7 +20,7 @@ class StaticAvatarRenderer(AvatarRenderer):
     def __init__(self, width: int = 640, height: int = 480) -> None:
         self._width = width
         self._height = height
-        self._portrait_data: Optional[bytes] = None
+        self._portrait_data: bytes | None = None
 
     async def initialize(self, portrait_path: str) -> None:
         path = Path(portrait_path)
@@ -30,9 +29,7 @@ class StaticAvatarRenderer(AvatarRenderer):
         self._portrait_data = path.read_bytes()
         logger.info("Static avatar loaded: %s (%d bytes)", portrait_path, len(self._portrait_data))
 
-    async def render_frames(
-        self, audio_pcm: bytes, sample_rate: int = 16000
-    ) -> list[bytes]:
+    async def render_frames(self, audio_pcm: bytes, sample_rate: int = 16000) -> list[bytes]:
         # Static renderer always returns the same frame
         if self._portrait_data:
             duration_s = len(audio_pcm) / (sample_rate * 2)
@@ -40,7 +37,7 @@ class StaticAvatarRenderer(AvatarRenderer):
             return [self._portrait_data] * n_frames
         return []
 
-    async def get_idle_frame(self) -> Optional[bytes]:
+    async def get_idle_frame(self) -> bytes | None:
         return self._portrait_data
 
     async def shutdown(self) -> None:

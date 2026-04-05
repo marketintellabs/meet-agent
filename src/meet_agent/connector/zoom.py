@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import base64
 import logging
-from typing import Optional
 
 from playwright.async_api import Browser, BrowserContext, Page, async_playwright
 
@@ -107,10 +106,10 @@ class ZoomConnector(MeetingConnector):
         super().__init__(agent_name)
         self.headless = headless
         self._playwright = None
-        self._browser: Optional[Browser] = None
-        self._context: Optional[BrowserContext] = None
-        self._page: Optional[Page] = None
-        self._capture_task: Optional[asyncio.Task] = None
+        self._browser: Browser | None = None
+        self._context: BrowserContext | None = None
+        self._page: Page | None = None
+        self._capture_task: asyncio.Task | None = None
 
     async def join(self, meeting_url: str) -> None:
         self.state = ConnectorState.CONNECTING
@@ -266,11 +265,11 @@ class ZoomConnector(MeetingConnector):
                 "#wc-footer, .meeting-app, .zm-btn--leave",
                 timeout=60000,
             )
-        except Exception:
+        except Exception as exc:
             raise RuntimeError(
                 "Timed out waiting to join Zoom meeting. "
                 "The host may need to admit the bot from the waiting room."
-            )
+            ) from exc
 
     async def _mute_media(self) -> None:
         """Mute camera and microphone after joining."""

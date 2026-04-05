@@ -25,9 +25,7 @@ def test_vad_detects_silence():
 
 
 def test_vad_detects_speech_segment():
-    vad = VADProcessor(
-        threshold=0.5, min_speech_ms=100, min_silence_ms=200, sample_rate=16000
-    )
+    vad = VADProcessor(threshold=0.5, min_speech_ms=100, min_silence_ms=200, sample_rate=16000)
     # Feed speech chunks
     for _ in range(20):
         vad.process_chunk(_make_noise(30))

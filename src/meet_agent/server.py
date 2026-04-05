@@ -4,13 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from meet_agent import __version__
-from meet_agent.config import Settings, get_settings
+from meet_agent.config import get_settings
 from meet_agent.connector.base import MeetingConnector
 from meet_agent.connector.google_meet import GoogleMeetConnector
 from meet_agent.connector.zoom import ZoomConnector
@@ -18,7 +17,7 @@ from meet_agent.pipeline.llm import LLMProvider
 from meet_agent.pipeline.stt import create_stt_provider
 from meet_agent.pipeline.tts import create_tts_provider
 from meet_agent.pipeline.vad import VADProcessor
-from meet_agent.session import MeetingSession, SessionState
+from meet_agent.session import MeetingSession
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +34,8 @@ _session_tasks: dict[str, asyncio.Task] = {}
 
 class JoinRequest(BaseModel):
     meeting_url: str = Field(..., description="Google Meet or Zoom meeting URL")
-    agent_name: Optional[str] = Field(None, description="Display name for the agent")
-    system_prompt: Optional[str] = Field(None, description="System prompt for the LLM")
+    agent_name: str | None = Field(None, description="Display name for the agent")
+    system_prompt: str | None = Field(None, description="System prompt for the LLM")
 
 
 class SessionResponse(BaseModel):
@@ -45,7 +44,7 @@ class SessionResponse(BaseModel):
     state: str
     created_at: float
     agent_responses: int
-    error: Optional[str] = None
+    error: str | None = None
 
 
 class TranscriptEntryResponse(BaseModel):
@@ -189,9 +188,7 @@ async def get_transcript(session_id: str):
     return TranscriptResponse(
         session_id=session_id,
         entries=[
-            TranscriptEntryResponse(
-                speaker=e.speaker, text=e.text, timestamp=e.timestamp
-            )
+            TranscriptEntryResponse(speaker=e.speaker, text=e.text, timestamp=e.timestamp)
             for e in session.transcript
         ],
     )

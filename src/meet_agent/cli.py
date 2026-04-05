@@ -6,7 +6,6 @@ import asyncio
 import logging
 import signal
 import sys
-from typing import Optional
 
 import click
 from rich.console import Console
@@ -33,7 +32,6 @@ def _create_session_from_settings(settings: Settings):
     """Wire up all components and return a MeetingSession."""
     from meet_agent.connector.base import MeetingConnector
     from meet_agent.connector.google_meet import GoogleMeetConnector
-    from meet_agent.connector.zoom import ZoomConnector
     from meet_agent.pipeline.llm import LLMProvider
     from meet_agent.pipeline.stt import create_stt_provider
     from meet_agent.pipeline.tts import create_tts_provider
@@ -75,10 +73,7 @@ def _create_session_from_settings(settings: Settings):
         sample_rate=settings.sample_rate,
     )
 
-    platform = MeetingConnector.detect_platform("")  # placeholder
-    connector: MeetingConnector
-    # We'll set the correct connector in the join command based on URL
-    connector = GoogleMeetConnector(agent_name=settings.agent_name)
+    connector: MeetingConnector = GoogleMeetConnector(agent_name=settings.agent_name)
 
     return MeetingSession(
         connector=connector,
@@ -105,8 +100,8 @@ def main() -> None:
 @click.option("-v", "--verbose", is_flag=True, help="Enable debug logging")
 def join(
     meeting_url: str,
-    name: Optional[str],
-    system_prompt: Optional[str],
+    name: str | None,
+    system_prompt: str | None,
     headless: bool,
     verbose: bool,
 ) -> None:

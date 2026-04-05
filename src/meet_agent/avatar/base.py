@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 
 class AvatarRenderer(ABC):
@@ -23,9 +22,7 @@ class AvatarRenderer(ABC):
         ...
 
     @abstractmethod
-    async def render_frames(
-        self, audio_pcm: bytes, sample_rate: int = 16000
-    ) -> list[bytes]:
+    async def render_frames(self, audio_pcm: bytes, sample_rate: int = 16000) -> list[bytes]:
         """Generate lip-synced video frames for the given audio.
 
         Args:
@@ -38,7 +35,7 @@ class AvatarRenderer(ABC):
         ...
 
     @abstractmethod
-    async def get_idle_frame(self) -> Optional[bytes]:
+    async def get_idle_frame(self) -> bytes | None:
         """Return a single idle/neutral frame (no lip movement).
 
         Used when the agent is listening or thinking.
@@ -52,15 +49,12 @@ class AvatarRenderer(ABC):
 
     @property
     @abstractmethod
-    def frame_width(self) -> int:
-        ...
+    def frame_width(self) -> int: ...
 
     @property
     @abstractmethod
-    def frame_height(self) -> int:
-        ...
+    def frame_height(self) -> int: ...
 
     @property
     @abstractmethod
-    def fps(self) -> float:
-        ...
+    def fps(self) -> float: ...

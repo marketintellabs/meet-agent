@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import io
 import logging
 from abc import ABC, abstractmethod
-from typing import Optional
 
 import httpx
 
@@ -102,11 +100,10 @@ class FasterWhisperSTT(STTProvider):
         self.language = language
         try:
             from faster_whisper import WhisperModel
-        except ImportError:
+        except ImportError as exc:
             raise ImportError(
-                "faster-whisper is not installed. "
-                "Install with: pip install meet-agent[stt-local]"
-            )
+                "faster-whisper is not installed. Install with: pip install meet-agent[stt-local]"
+            ) from exc
         self._model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
     async def transcribe(self, pcm_audio: bytes, sample_rate: int = 16000) -> str:

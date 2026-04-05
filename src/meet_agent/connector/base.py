@@ -5,8 +5,9 @@ from __future__ import annotations
 import asyncio
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Coroutine
 from enum import Enum
-from typing import Any, Callable, Coroutine, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 

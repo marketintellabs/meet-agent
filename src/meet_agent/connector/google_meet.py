@@ -4,9 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
-import json
 import logging
-from typing import Optional
 
 from playwright.async_api import Browser, BrowserContext, Page, async_playwright
 
@@ -112,10 +110,10 @@ class GoogleMeetConnector(MeetingConnector):
         super().__init__(agent_name)
         self.headless = headless
         self._playwright = None
-        self._browser: Optional[Browser] = None
-        self._context: Optional[BrowserContext] = None
-        self._page: Optional[Page] = None
-        self._capture_task: Optional[asyncio.Task] = None
+        self._browser: Browser | None = None
+        self._context: BrowserContext | None = None
+        self._page: Page | None = None
+        self._capture_task: asyncio.Task | None = None
 
     async def join(self, meeting_url: str) -> None:
         self.state = ConnectorState.CONNECTING
@@ -258,14 +256,12 @@ class GoogleMeetConnector(MeetingConnector):
     async def _wait_for_meeting(self) -> None:
         """Wait until we're actually in the meeting (leave button appears)."""
         try:
-            await self._page.wait_for_selector(
-                '[aria-label="Leave call"]', timeout=60000
-            )
-        except Exception:
+            await self._page.wait_for_selector('[aria-label="Leave call"]', timeout=60000)
+        except Exception as exc:
             raise RuntimeError(
                 "Timed out waiting to join the meeting. "
                 "You may need to admit the bot from the meeting."
-            )
+            ) from exc
 
     async def _poll_audio(self) -> None:
         """Background task: drain captured audio chunks and emit them."""
