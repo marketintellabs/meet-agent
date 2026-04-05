@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -38,15 +37,15 @@ class Settings(BaseSettings):
 
     # STT
     stt_provider: STTProviderType = STTProviderType.DEEPINFRA
-    stt_api_key: Optional[str] = None
-    stt_api_base: Optional[str] = None
+    stt_api_key: str | None = None
+    stt_api_base: str | None = None
     stt_model: str = "openai/whisper-large-v3-turbo"
     stt_language: str = "en"
 
     # TTS
     tts_provider: TTSProviderType = TTSProviderType.OPENAI
-    tts_api_key: Optional[str] = None
-    tts_api_base: Optional[str] = None
+    tts_api_key: str | None = None
+    tts_api_base: str | None = None
     tts_model: str = "tts-1"
     tts_voice: str = "alloy"
     tts_speed: float = 1.0
@@ -72,12 +71,12 @@ class Settings(BaseSettings):
 
     # Avatar (v0.2)
     avatar_enabled: bool = False
-    avatar_image: Optional[str] = None
+    avatar_image: str | None = None
     avatar_gpu_provider: GPUProviderType = GPUProviderType.LOCAL
 
     # RunPod (v0.2)
-    runpod_api_key: Optional[str] = None
-    runpod_endpoint_id: Optional[str] = None
+    runpod_api_key: str | None = None
+    runpod_endpoint_id: str | None = None
 
     # Server
     server_host: str = "0.0.0.0"

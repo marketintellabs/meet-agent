@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import io
 import logging
 from abc import ABC, abstractmethod
-from typing import Optional
 
 import httpx
 
@@ -61,9 +59,7 @@ class OpenAITTS(TTSProvider):
         wav_data = resp.content
         pcm, sr, ch = wav_to_pcm(wav_data)
         if sr != 16000:
-            import numpy as np
-
-            from meet_agent.audio import resample, float32_to_int16, int16_to_float32
+            from meet_agent.audio import float32_to_int16, int16_to_float32, resample
 
             audio = int16_to_float32(pcm)
             audio = resample(audio, sr, 16000)
@@ -75,7 +71,7 @@ class OpenAITTS(TTSProvider):
 class PiperTTS(TTSProvider):
     """TTS via locally-running Piper. Requires `pip install meet-agent[tts-local]`."""
 
-    def __init__(self, model: str = "en_US-lessac-medium", data_dir: Optional[str] = None) -> None:
+    def __init__(self, model: str = "en_US-lessac-medium", data_dir: str | None = None) -> None:
         self.model = model
         self.data_dir = data_dir
         self._piper = None
@@ -84,8 +80,8 @@ class PiperTTS(TTSProvider):
         import asyncio
 
         def _run() -> bytes:
-            import subprocess
             import shutil
+            import subprocess
 
             piper_bin = shutil.which("piper") or "piper"
             args = [piper_bin, "--model", self.model, "--output_raw"]

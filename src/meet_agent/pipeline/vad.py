@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from collections import deque
-from typing import Optional
 
 import numpy as np
 
@@ -46,9 +45,7 @@ class VADProcessor:
         try:
             import torch
 
-            model, utils = torch.hub.load(
-                "snakers4/silero-vad", "silero_vad", trust_repo=True
-            )
+            model, utils = torch.hub.load("snakers4/silero-vad", "silero_vad", trust_repo=True)
             self._silero_model = model
             self._get_speech_prob = utils[0] if callable(utils[0]) else None
             self._use_silero = True
@@ -56,7 +53,7 @@ class VADProcessor:
         except Exception:
             logger.info("VAD: silero-vad not available, using energy-based detection")
 
-    def process_chunk(self, pcm_chunk: bytes) -> Optional[bytes]:
+    def process_chunk(self, pcm_chunk: bytes) -> bytes | None:
         """Process a PCM int16 chunk (~30ms). Returns a complete speech segment or None.
 
         When speech ends (after min_silence_ms of silence), returns the full
@@ -95,7 +92,7 @@ class VADProcessor:
 
         return None
 
-    def flush(self) -> Optional[bytes]:
+    def flush(self) -> bytes | None:
         """Flush any remaining speech buffer."""
         if self._speech_buffer:
             segment = b"".join(self._speech_buffer)

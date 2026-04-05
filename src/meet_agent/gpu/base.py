@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 
 class GPUProvider(ABC):
@@ -34,5 +33,4 @@ class GPUProvider(ABC):
 
     @property
     @abstractmethod
-    def is_running(self) -> bool:
-        ...
+    def is_running(self) -> bool: ...

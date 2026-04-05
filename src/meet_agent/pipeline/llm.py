@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
 
 import httpx
 
@@ -55,7 +54,7 @@ class LLMProvider:
         self._history.append(Message(role="assistant", content=text))
         self._trim_history()
 
-    async def generate_response(self, user_text: Optional[str] = None) -> str:
+    async def generate_response(self, user_text: str | None = None) -> str:
         """Generate a response from the LLM given the current conversation history."""
         if user_text:
             self.add_user_message(user_text)

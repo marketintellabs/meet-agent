@@ -1,7 +1,5 @@
 """Tests for configuration loading."""
 
-import os
-
 from meet_agent.config import Settings, STTProviderType, TTSProviderType
 
 

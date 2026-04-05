@@ -8,7 +8,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from meet_agent.audio import rms_level
 from meet_agent.config import Settings
@@ -44,7 +44,7 @@ class SessionInfo:
     created_at: float
     transcript: list[TranscriptEntry] = field(default_factory=list)
     agent_responses: int = 0
-    error: Optional[str] = None
+    error: str | None = None
 
 
 class MeetingSession:
@@ -80,7 +80,7 @@ class MeetingSession:
         self.created_at = time.time()
         self.transcript: list[TranscriptEntry] = []
         self.agent_responses = 0
-        self.error: Optional[str] = None
+        self.error: str | None = None
 
         self._stop_event = asyncio.Event()
         self._audio_queue: asyncio.Queue[bytes] = asyncio.Queue(maxsize=500)
@@ -146,9 +146,7 @@ class MeetingSession:
         """Main loop: drain audio queue, run VAD, and trigger responses."""
         while not self._stop_event.is_set():
             try:
-                pcm_chunk = await asyncio.wait_for(
-                    self._audio_queue.get(), timeout=0.5
-                )
+                pcm_chunk = await asyncio.wait_for(self._audio_queue.get(), timeout=0.5)
             except asyncio.TimeoutError:
                 # Check if we have pending speech and enough silence has passed
                 await self._check_response_trigger()
@@ -173,8 +171,7 @@ class MeetingSession:
         if (
             self._last_speech_time > 0
             and self.state == SessionState.LISTENING
-            and time.time() - self._last_speech_time
-            > self.settings.response_delay_ms / 1000
+            and time.time() - self._last_speech_time > self.settings.response_delay_ms / 1000
         ):
             # Silence threshold reached — but only respond if there's new user input
             self._last_speech_time = 0
@@ -198,9 +195,7 @@ class MeetingSession:
 
                 logger.info("Session %s: heard — %s", self.id, text[:100])
                 self.transcript.append(
-                    TranscriptEntry(
-                        speaker="Participant", text=text, timestamp=time.time()
-                    )
+                    TranscriptEntry(speaker="Participant", text=text, timestamp=time.time())
                 )
 
                 # LLM

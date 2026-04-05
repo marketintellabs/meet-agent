@@ -1,6 +1,6 @@
 """Tests for LLM provider."""
 
-from meet_agent.pipeline.llm import LLMProvider, Message
+from meet_agent.pipeline.llm import LLMProvider
 
 
 def test_history_management():

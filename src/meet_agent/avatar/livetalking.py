@@ -13,7 +13,6 @@ a running LiveTalking server to function.
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import httpx
 
@@ -41,8 +40,8 @@ class LiveTalkingRenderer(AvatarRenderer):
         self._height = height
         self.model = model
         self._client = httpx.AsyncClient(timeout=30.0)
-        self._session_id: Optional[str] = None
-        self._idle_frame: Optional[bytes] = None
+        self._session_id: str | None = None
+        self._idle_frame: bytes | None = None
 
     async def initialize(self, portrait_path: str) -> None:
         """Upload the reference portrait to the LiveTalking server."""
@@ -67,9 +66,7 @@ class LiveTalkingRenderer(AvatarRenderer):
         if idle_resp.status_code == 200:
             self._idle_frame = idle_resp.content
 
-    async def render_frames(
-        self, audio_pcm: bytes, sample_rate: int = 16000
-    ) -> list[bytes]:
+    async def render_frames(self, audio_pcm: bytes, sample_rate: int = 16000) -> list[bytes]:
         """Send audio to LiveTalking and receive lip-synced frames."""
         if not self._session_id:
             raise RuntimeError("Avatar not initialized — call initialize() first")
@@ -89,10 +86,11 @@ class LiveTalkingRenderer(AvatarRenderer):
         frames: list[bytes] = []
         for frame_b64 in result.get("frames", []):
             import base64
+
             frames.append(base64.b64decode(frame_b64))
         return frames
 
-    async def get_idle_frame(self) -> Optional[bytes]:
+    async def get_idle_frame(self) -> bytes | None:
         return self._idle_frame
 
     async def shutdown(self) -> None:
